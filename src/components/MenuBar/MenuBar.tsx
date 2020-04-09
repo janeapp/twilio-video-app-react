@@ -55,13 +55,23 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function MenuBar() {
   const classes = useStyles();
-  const { URLRoomName } = useParams();
-  const { user, getToken, isFetching } = useAppState();
+  const { URLRoomName, jwt, jwtHost } = useParams();
+  const { user, getToken, getTokenWithJwt, isFetching } = useAppState();
   const { isConnecting, connect } = useVideoContext();
   const roomState = useRoomState();
 
   const [name, setName] = useState<string>(user?.displayName || '');
   const [roomName, setRoomName] = useState<string>('');
+
+  useEffect(() => {
+    if (jwt) {
+      // @ts-ignore
+      getTokenWithJwt(jwt, jwtHost).then(data => {
+        console.log('info from rails', data);
+        return connect(data.token);
+      });
+    }
+  }, [jwt]);
 
   useEffect(() => {
     if (URLRoomName) {
@@ -89,44 +99,7 @@ export default function MenuBar() {
   return (
     <AppBar className={classes.container} position="static">
       <Toolbar>
-        {roomState === 'disconnected' ? (
-          <form className={classes.form} onSubmit={handleSubmit}>
-            {window.location.search.includes('customIdentity=true') || !user?.displayName ? (
-              <TextField
-                id="menu-name"
-                label="Name"
-                className={classes.textField}
-                value={name}
-                onChange={handleNameChange}
-                margin="dense"
-              />
-            ) : (
-              <Typography className={classes.displayName} variant="body1">
-                {user.displayName}
-              </Typography>
-            )}
-            <TextField
-              id="menu-room"
-              label="Room"
-              className={classes.textField}
-              value={roomName}
-              onChange={handleRoomNameChange}
-              margin="dense"
-            />
-            <Button
-              className={classes.joinButton}
-              type="submit"
-              color="primary"
-              variant="contained"
-              disabled={isConnecting || !name || !roomName || isFetching}
-            >
-              Join Room
-            </Button>
-            {(isConnecting || isFetching) && <CircularProgress className={classes.loadingSpinner} />}
-          </form>
-        ) : (
-          <h3>{roomName}</h3>
-        )}
+        {roomState === 'disconnected' ? <h3>Loading...</h3> : <h3>{roomName}</h3>}
         <div className={classes.rightButtonContainer}>
           <LocalAudioLevelIndicator />
           <ToggleFullscreenButton />

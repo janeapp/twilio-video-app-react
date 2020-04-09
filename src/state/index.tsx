@@ -8,6 +8,7 @@ export interface StateContextType {
   error: TwilioError | null;
   setError(error: TwilioError | null): void;
   getToken(name: string, room: string, passcode?: string): Promise<string>;
+  getTokenWithJwt(jwt: string, jwtHost: string): Promise<any>;
   user?: User | null | { displayName: undefined; photoURL: undefined; passcode?: string };
   signIn?(passcode?: string): Promise<void>;
   signOut?(): Promise<void>;
@@ -46,6 +47,17 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
       ...contextValue,
       ...usePasscodeAuth(), // eslint-disable-line react-hooks/rules-of-hooks
     };
+  } else if (process.env.REACT_APP_AUTH === 'jwt') {
+    contextValue = {
+      ...contextValue,
+      getTokenWithJwt: async (jwt, jwtHost) => {
+        const headers = new window.Headers();
+        const endpoint = jwtHost;
+        const params = new window.URLSearchParams({ jwt });
+
+        return fetch(`//${endpoint}/video_chat_sessions/token?${params}`, { headers }).then(res => res.json());
+      },
+    };
   } else {
     contextValue = {
       ...contextValue,
@@ -74,7 +86,26 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
       });
   };
 
-  return <StateContext.Provider value={{ ...contextValue, getToken }}>{props.children}</StateContext.Provider>;
+  const getTokenWithJwt: StateContextType['getTokenWithJwt'] = (jwt, jwtHost) => {
+    setIsFetching(true);
+    return contextValue
+      .getTokenWithJwt(jwt, jwtHost)
+      .then(res => {
+        setIsFetching(false);
+        return res;
+      })
+      .catch(err => {
+        setError(err);
+        setIsFetching(false);
+        return Promise.reject(err);
+      });
+  };
+
+  return (
+    <StateContext.Provider value={{ ...contextValue, getToken, getTokenWithJwt }}>
+      {props.children}
+    </StateContext.Provider>
+  );
 }
 
 export function useAppState() {
