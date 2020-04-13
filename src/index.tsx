@@ -52,16 +52,9 @@ ReactDOM.render(
     <Router>
       <AppStateProvider>
         <Switch>
-          <PrivateRoute exact path="/">
-            <VideoApp />
-          </PrivateRoute>
           <PrivateRoute path="/jwt/:jwt/host/:jwtHost">
             <VideoApp />
           </PrivateRoute>
-          <PrivateRoute path="/room/:URLRoomName">
-            <VideoApp />
-          </PrivateRoute>
-          <Redirect to="/" />
         </Switch>
       </AppStateProvider>
     </Router>
