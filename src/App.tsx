@@ -4,6 +4,7 @@ import { styled } from '@material-ui/core/styles';
 import Controls from './components/Controls/Controls';
 import LocalVideoPreview from './components/LocalVideoPreview/LocalVideoPreview';
 import MenuBar from './components/MenuBar/MenuBar';
+import ConnectWithJWT from './components/ConnectWithJWT/ConnectWithJWT';
 import ReconnectingNotification from './components/ReconnectingNotification/ReconnectingNotification';
 import Room from './components/Room/Room';
 
@@ -33,6 +34,7 @@ export default function App() {
     <Container style={{ height }}>
       <MenuBar />
       <Main>
+        <ConnectWithJWT />
         {roomState === 'disconnected' ? <LocalVideoPreview /> : <Room />}
         <Controls />
       </Main>

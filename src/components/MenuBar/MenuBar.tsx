@@ -62,44 +62,6 @@ export default function MenuBar() {
 
   const [name, setName] = useState<string>(user?.displayName || '');
   const [roomName, setRoomName] = useState<string>('');
-  const [leaveUrl, setLeaveUrl] = useState<string>('');
-
-  useEffect(() => {
-    if (!jwt) {
-      return undefined;
-    }
-
-    // @ts-ignore
-    getTokenWithJwt(jwt, jwtHost).then(data => {
-      console.log('info from rails', data);
-      const { token, leave_url, survey_url } = data;
-
-      setLeaveUrl(leave_url);
-
-      return connect(token);
-    });
-  }, [jwt]);
-
-  useEffect(() => {
-    if (leaveUrl.length) {
-      const startedAt = new Date().toISOString();
-
-      const unload = () => {
-        const obj = {
-          jwt: jwt,
-          started_at: startedAt,
-        };
-        const beaconData = new Blob([JSON.stringify(obj, null, 2)], { type: 'text/plain; charset=UTF-8' });
-        navigator.sendBeacon(leaveUrl, beaconData);
-      };
-
-      window.addEventListener('unload', unload);
-
-      return () => {
-        window.removeEventListener('unload', unload);
-      };
-    }
-  }, [leaveUrl]);
 
   useEffect(() => {
     if (URLRoomName) {
