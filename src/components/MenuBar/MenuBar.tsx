@@ -16,23 +16,21 @@ import useRoomState from '../../hooks/useRoomState/useRoomState';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { Typography } from '@material-ui/core';
 
+import { ReactComponent as VideoLogo } from './video-chat-icon.svg';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       backgroundColor: theme.palette.background.default,
     },
+    logo: {
+      height: '3em',
+      width: '4em',
+    },
     rightButtonContainer: {
       display: 'flex',
       alignItems: 'center',
       marginLeft: 'auto',
-    },
-    form: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      [theme.breakpoints.up('md')]: {
-        marginLeft: '2.2em',
-      },
     },
     textField: {
       marginLeft: theme.spacing(1),
@@ -69,26 +67,10 @@ export default function MenuBar() {
     }
   }, [URLRoomName]);
 
-  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-
-  const handleRoomNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setRoomName(event.target.value);
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // If this app is deployed as a twilio function, don't change the URL beacuse routing isn't supported.
-    if (!window.location.origin.includes('twil.io')) {
-      window.history.replaceState(null, '', window.encodeURI(`/room/${roomName}${window.location.search || ''}`));
-    }
-    getToken(name, roomName).then(token => connect(token));
-  };
-
   return (
     <AppBar className={classes.container} position="static">
       <Toolbar>
+        <VideoLogo className={classes.logo} />
         {roomState === 'disconnected' ? <h3>Loading...</h3> : <h3>{roomName}</h3>}
         <div className={classes.rightButtonContainer}>
           <LocalAudioLevelIndicator />
