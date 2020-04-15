@@ -15,6 +15,16 @@ import theme from './theme';
 import './types';
 import { VideoProvider } from './components/VideoProvider';
 
+import Bugsnag from '@bugsnag/js';
+import BugsnagPluginReact from '@bugsnag/plugin-react';
+
+Bugsnag.start({
+  apiKey: process.env.REACT_APP_BUGSNAG_KEY || '',
+  plugins: [new BugsnagPluginReact(React)],
+});
+
+const ErrorBoundary = Bugsnag.getPlugin('react');
+
 // See: https://media.twiliocdn.com/sdk/js/video/releases/2.0.0/docs/global.html#ConnectOptions
 // for available connection options.
 const connectionOptions: ConnectOptions = {
@@ -47,17 +57,19 @@ const VideoApp = () => {
 };
 
 ReactDOM.render(
-  <MuiThemeProvider theme={theme}>
-    <CssBaseline />
-    <Router>
-      <AppStateProvider>
-        <Switch>
-          <PrivateRoute path="/jwt/:jwt/host/:jwtHost">
-            <VideoApp />
-          </PrivateRoute>
-        </Switch>
-      </AppStateProvider>
-    </Router>
-  </MuiThemeProvider>,
+  <ErrorBoundary>
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <AppStateProvider>
+          <Switch>
+            <PrivateRoute path="/jwt/:jwt/host/:jwtHost">
+              <VideoApp />
+            </PrivateRoute>
+          </Switch>
+        </AppStateProvider>
+      </Router>
+    </MuiThemeProvider>
+  </ErrorBoundary>,
   document.getElementById('root')
 );
