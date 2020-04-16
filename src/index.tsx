@@ -14,15 +14,21 @@ import theme from './theme';
 import './types';
 import { VideoProvider } from './components/VideoProvider';
 
+import ReactGA from 'react-ga';
+
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
 
+// Bugsnag
 Bugsnag.start({
   apiKey: process.env.REACT_APP_BUGSNAG_KEY || '',
   plugins: [new BugsnagPluginReact(React)],
 });
-
 const ErrorBoundary = Bugsnag.getPlugin('react');
+
+// GA
+const trackingId = process.env.REACT_APP_GA_KEY || ''; // Replace with your Google Analytics tracking ID
+ReactGA.initialize(trackingId);
 
 // See: https://media.twiliocdn.com/sdk/js/video/releases/2.0.0/docs/global.html#ConnectOptions
 // for available connection options.

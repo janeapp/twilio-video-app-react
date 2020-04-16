@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LocalVideoTrack, RemoteVideoTrack } from 'twilio-video';
+import analytics from '../../analytics';
 
 type TrackType = RemoteVideoTrack | LocalVideoTrack | undefined | null;
 
@@ -14,8 +15,14 @@ export default function useIsTrackSwitchedOff(track: TrackType) {
     setIsSwitchedOff(track && track.isSwitchedOff);
 
     if (track) {
-      const handleSwitchedOff = () => setIsSwitchedOff(true);
-      const handleSwitchedOn = () => setIsSwitchedOff(false);
+      const handleSwitchedOff = () => {
+        analytics('trackSwitchedOff', `${track} switched off`);
+        return setIsSwitchedOff(true);
+      };
+      const handleSwitchedOn = () => {
+        analytics('trackSwitchedOn', `${track} switched on`);
+        return setIsSwitchedOff(false);
+      };
       track.on('switchedOff', handleSwitchedOff);
       track.on('switchedOn', handleSwitchedOn);
       return () => {

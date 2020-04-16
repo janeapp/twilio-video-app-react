@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LocalAudioTrack, LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
+import analytics from '../../analytics';
 
 type TrackType = LocalAudioTrack | LocalVideoTrack | RemoteAudioTrack | RemoteVideoTrack | undefined;
 
@@ -10,8 +11,14 @@ export default function useIsTrackEnabled(track: TrackType) {
     setIsEnabled(track ? track.isEnabled : true);
 
     if (track) {
-      const setEnabled = () => setIsEnabled(true);
-      const setDisabled = () => setIsEnabled(false);
+      const setEnabled = () => {
+        analytics('trackEnabled', `${track} enabled`);
+        return setIsEnabled(true);
+      };
+      const setDisabled = () => {
+        analytics('trackDisabled', `${track} disabled`);
+        return setIsEnabled(false);
+      };
       track.on('enabled', setEnabled);
       track.on('disabled', setDisabled);
       return () => {

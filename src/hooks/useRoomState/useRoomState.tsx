@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import useVideoContext from '../useVideoContext/useVideoContext';
+import analytics from '../../analytics';
 
 type RoomStateType = 'disconnected' | 'connected' | 'reconnecting';
 
@@ -8,7 +9,10 @@ export default function useRoomState() {
   const [state, setState] = useState<RoomStateType>('disconnected');
 
   useEffect(() => {
-    const setRoomState = () => setState((room.state || 'disconnected') as RoomStateType);
+    const setRoomState = () => {
+      analytics('setRoomState', `Room state: ${room.state || 'disconnected'}`);
+      return setState((room.state || 'disconnected') as RoomStateType);
+    };
     setRoomState();
     room
       .on('disconnected', setRoomState)

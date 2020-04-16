@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { RemoteParticipant } from 'twilio-video';
 import useDominantSpeaker from '../useDominantSpeaker/useDominantSpeaker';
 import useVideoContext from '../useVideoContext/useVideoContext';
+import analytics from '../../analytics';
 
 export default function useParticipants() {
   const { room } = useVideoContext();
@@ -21,10 +22,14 @@ export default function useParticipants() {
   }, [dominantSpeaker]);
 
   useEffect(() => {
-    const participantConnected = (participant: RemoteParticipant) =>
-      setParticipants(prevParticipants => [...prevParticipants, participant]);
-    const participantDisconnected = (participant: RemoteParticipant) =>
-      setParticipants(prevParticipants => prevParticipants.filter(p => p !== participant));
+    const participantConnected = (participant: RemoteParticipant) => {
+      analytics('participantConnected', 'Participant connected');
+      return setParticipants(prevParticipants => [...prevParticipants, participant]);
+    };
+    const participantDisconnected = (participant: RemoteParticipant) => {
+      analytics('participantDisconnected', 'Particpant disconnected');
+      return setParticipants(prevParticipants => prevParticipants.filter(p => p !== participant));
+    };
     room.on('participantConnected', participantConnected);
     room.on('participantDisconnected', participantDisconnected);
     return () => {
