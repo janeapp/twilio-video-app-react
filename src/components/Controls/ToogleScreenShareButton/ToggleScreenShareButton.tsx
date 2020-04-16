@@ -10,6 +10,9 @@ import useScreenShareToggle from '../../../hooks/useScreenShareToggle/useScreenS
 import useScreenShareParticipant from '../../../hooks/useScreenShareParticipant/useScreenShareParticipant';
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
 
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+
 export const SCREEN_SHARE_TEXT = 'Share Screen';
 export const STOP_SCREEN_SHARE_TEXT = 'Stop Sharing Screen';
 export const SHARE_IN_PROGRESS_TEXT = 'Cannot share screen when another user is sharing';
@@ -37,6 +40,13 @@ export default function ToggleScreenShareButton(props: { disabled?: boolean }) {
   const isDisabled = props.disabled || disableScreenShareButton || !isScreenShareSupported;
 
   let tooltipMessage = SCREEN_SHARE_TEXT;
+
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+
+  if (matches) {
+    return null;
+  }
 
   if (isScreenShared) {
     tooltipMessage = STOP_SCREEN_SHARE_TEXT;
