@@ -55,7 +55,16 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
         const endpoint = jwtHost;
         const params = new window.URLSearchParams({ jwt });
 
-        return fetch(`//${endpoint}/video_chat_sessions/token?${params}`, { headers }).then(res => res.json());
+        return fetch(`//${endpoint}/video_chat_sessions/token?${params}`, { headers })
+          .then(res => {
+            if (res.ok) {
+              return res.json();
+            } else {
+              console.log('response not ok', res);
+              return Promise.reject(res);
+            }
+          })
+          .catch(res => res.json().then((json: any) => Promise.reject(json)));
       },
     };
   } else {
@@ -94,10 +103,16 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
         setIsFetching(false);
         return res;
       })
-      .catch(err => {
-        setError(err);
+      .catch(error => {
+        setError({
+          code: error.code,
+          name: error.error,
+          message: error.message,
+          cta_label: 'Close',
+          cta_action: () => window.close(),
+        });
         setIsFetching(false);
-        return Promise.reject(err);
+        return Promise.reject(error);
       });
   };
 

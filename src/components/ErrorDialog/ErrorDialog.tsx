@@ -14,7 +14,7 @@ interface ErrorDialogProps {
 }
 
 function ErrorDialog({ dismissError, error }: PropsWithChildren<ErrorDialogProps>) {
-  const { message, code } = error || {};
+  const { message, code, cta_label, cta_action } = error || {};
   const enhancedMessage = enhanceMessage(message, code);
 
   return (
@@ -29,9 +29,20 @@ function ErrorDialog({ dismissError, error }: PropsWithChildren<ErrorDialogProps
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => dismissError()} color="primary" autoFocus>
-          OK
-        </Button>
+        {cta_label && cta_action ? (
+          <Button onClick={cta_action} color="primary" autoFocus>
+            {cta_label}
+          </Button>
+        ) : (
+          <>
+            <Button onClick={() => window.location.reload()} color="primary" autoFocus>
+              Reconnect
+            </Button>
+            <Button onClick={() => dismissError()} color="primary" autoFocus>
+              OK
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   );

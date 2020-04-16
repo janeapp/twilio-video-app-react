@@ -4,6 +4,13 @@ import { useParams } from 'react-router-dom';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import useLocalVideoToggle from '../../hooks/useLocalVideoToggle/useLocalVideoToggle';
 
+interface Data {
+  room_name: string;
+  leave_url: string;
+  survey_url: string;
+  token: string;
+}
+
 const ConnectWhenReady = () => {
   const { user, getToken, getTokenWithJwt, isFetching } = useAppState();
   const { URLRoomName, jwt, jwtHost } = useParams();
@@ -18,14 +25,18 @@ const ConnectWhenReady = () => {
     }
 
     // @ts-ignore
-    getTokenWithJwt(jwt, jwtHost).then(data => {
-      console.log('info from rails', data);
-      const { token, leave_url, survey_url } = data;
+    getTokenWithJwt(jwt, jwtHost)
+      .then((data: Data) => {
+        console.log('info from rails', data);
+        const { token, leave_url, survey_url } = data;
 
-      setLeaveUrl(leave_url);
+        setLeaveUrl(leave_url);
 
-      return connect(token);
-    });
+        return connect(token);
+      })
+      .catch((err: string) => {
+        console.log('catch error at ConnectWithJWT', err);
+      });
 
     return undefined;
   }, [jwt]);
